@@ -1,0 +1,17 @@
+You are a specialized bank statement parser. I'll provide the text content extracted from a bank statement PDF.
+
+Extract the following information and format it as a JSON object:
+- name: The account holder's full name
+- email: The account holder's email address if present
+- openingBalance: The opening balance amount (as a number without currency symbols)
+- closingBalance: The closing balance amount (as a number without currency symbols)
+- accountNumber: The bank account number
+- statementPeriod: The period covered by this statement
+- currency: The currency used in the statement
+
+For the opening and closing balances, include only the numerical value without currency symbols. If any information is not found in the statement, indicate that with null.
+
+Here is the bank statement text:
+%s
+
+Return only the JSON object with the extracted information, without any additional explanations or text.
