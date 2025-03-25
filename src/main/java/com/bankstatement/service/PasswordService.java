@@ -47,19 +47,13 @@ public class PasswordService {
             return "GN"; // General
         }
 
-        switch (accountType.toLowerCase()) {
-            case "savings":
-                return "SV";
-            case "current":
-                return "CR";
-            case "salary":
-                return "SL";
-            case "fixed deposit":
-            case "fd":
-                return "FD";
-            default:
-                return accountType.substring(0, Math.min(2, accountType.length())).toUpperCase();
-        }
+        return switch (accountType.toLowerCase()) {
+            case "savings" -> "SV";
+            case "current" -> "CR";
+            case "salary" -> "SL";
+            case "fixed deposit", "fd" -> "FD";
+            default -> accountType.substring(0, Math.min(2, accountType.length())).toUpperCase();
+        };
     }
 
     private String generateRandomSegment(int length) {

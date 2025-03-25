@@ -16,9 +16,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Service for interacting with LLM APIs
- */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -31,54 +28,47 @@ public class LlmService {
     @Value("${openai.model}")
     private String model;
 
+    @Value("${openai.api.key}")
+    private String apiKey;
+
     @Value("${openai.timeout}")
     private int timeout;
 
     @Value("${prompt.template.path}")
     private String promptTemplatePath;
 
-    /**
-     * Extract structured information from bank statement text using LLM
-     *
-     * @param pdfText Extracted text from bank statement PDF
-     * @return Map containing structured data extracted by the LLM
-     * @throws IOException If there's an error processing the request
-     */
     public Map<String, Object> extractBankStatementInfo(String pdfText) throws IOException {
-        log.info("Extracting structured information from bank statement using LLM");
-
-        String promptTemplate = loadPromptTemplate();
-        String prompt = String.format(promptTemplate, pdfText);
-
-        List<ChatMessage> messages = List.of(
-                new ChatMessage("system", "You are a financial document parser specialized in extracting structured information from bank statements."),
-                new ChatMessage("user", prompt)
-        );
-
-        ChatCompletionRequest request = ChatCompletionRequest.builder()
-                .model(model)
-                .messages(messages)
-                .temperature(0.1) // Low temperature for more deterministic output
-                .build();
-
-        String response = openAiService.createChatCompletion(request)
-                .getChoices().get(0).getMessage().getContent();
+        log.error("OpenAI Configuration Details:");
+        log.error("Model: {}", model);
+        log.error("API Key Present: {}", apiKey != null && !apiKey.isEmpty());
+        log.error("Timeout: {} seconds", timeout);
 
         try {
-            // Parse the JSON response into a Map
+            String promptTemplate = loadPromptTemplate();
+            String prompt = String.format(promptTemplate, pdfText);
+
+            List<ChatMessage> messages = List.of(
+                    new ChatMessage("system", "You are a financial document parser specialized in extracting structured information from bank statements."),
+                    new ChatMessage("user", prompt)
+            );
+
+            ChatCompletionRequest request = ChatCompletionRequest.builder()
+                    .model(model)
+                    .messages(messages)
+                    .temperature(0.1)
+                    .build();
+
+            String response = openAiService.createChatCompletion(request)
+                    .getChoices().get(0).getMessage().getContent();
+
             return objectMapper.readValue(response, Map.class);
+
         } catch (Exception e) {
-            log.error("Failed to parse LLM response as JSON", e);
-            throw new IOException("Failed to parse structured data from LLM response", e);
+            log.error("Detailed OpenAI API Error:", e);
+            throw new IOException("Failed to process bank statement with OpenAI: " + e.getMessage(), e);
         }
     }
 
-    /**
-     * Load the prompt template from resources
-     *
-     * @return Prompt template string
-     * @throws IOException If there's an error loading the template
-     */
     private String loadPromptTemplate() throws IOException {
         Resource resource = resourceLoader.getResource("classpath:" + promptTemplatePath);
         return new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);

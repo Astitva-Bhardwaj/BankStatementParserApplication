@@ -21,7 +21,7 @@
 	<properties>
 		<java.version>17</java.version>
 		<pdfbox.version>2.0.29</pdfbox.version>
-		<openai.version>0.12.0</openai.version>
+		<openai.version>0.16.0</openai.version>
 		<langchain4j.version>0.23.0</langchain4j.version>
 	</properties>
 
@@ -73,10 +73,12 @@
 		</dependency>
 
 		<!-- Lombok for boilerplate reduction -->
+		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<optional>true</optional>
+			<version>1.18.36</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- Testing -->
